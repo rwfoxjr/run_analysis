@@ -1,9 +1,15 @@
+#load dplyr
+library("dplyr", lib.loc="/Library/Frameworks/R.framework/Versions/3.2/Resources/library")
+
 #download UCI HAR dataset
 urlUcihar <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
 if(!file.exists("./ucihar")) {dir.create("./ucihar")}
 download.file(urlUcihar, destfile = "./ucihar/dataset.zip", method = "curl")
 dataZip <- "./ucihar/dataset.zip"
 unzip(dataZip,exdir = "./ucihar")
+
+rm(urlUcihar)
+rm(dataZip)
 
 #open the three files each for test and train 
 xtestFile <- read.delim("./ucihar/UCI HAR Dataset/test/X_test.txt", header = FALSE, sep = "\t", stringsAsFactors = FALSE)
@@ -34,14 +40,13 @@ xTrainUnpack <- unpackList(xtrainFile)
 
 rm(xtestFile)
 rm(xtrainFile)
+rm(unpackList)
 
 #create one file from each set of test files and train files
 testFile <- data.frame(measurements = ytestFile, activity = xTestUnpack, subject = subjectTestFile)
 trainFile <- data.frame(measurements = ytrainFile, activity = xTrainUnpack, subject = subjectTrainFile)
-
-#Label the data set with descriptive variable names.
-names(testFile) <- c("activity","mean","standard deviation", "subject")
-names(trainFile) <- c("activity","mean","standard deviation", "subject")
+names(testFile) <- c("activity_type","activity_mean","activity_standard_deviation", "subject")
+names(trainFile) <- c("activity_type","activity_mean","activity_standard_deviation", "subject")
 
 rm(xTestUnpack)
 rm(xTrainUnpack)
@@ -50,20 +55,32 @@ rm(ytrainFile)
 rm(subjectTestFile)
 rm(subjectTrainFile)
 
-#Assign descriptive activity names to name the activities in the data set
-sortTestFile <- arrange(testFile, activity)
-sortTrainFile <- arrange(trainFile, activity)
-
-activityLabels <- read.delim("~/Documents/Coursera/wk4Project/UCI HAR Dataset/activity_labels.txt", header = FALSE, sep = "\t")
-levels(sortTestFile$activity) <- activityLabels
-levels(sortTrainFile$activity) <- activityLabels
-rm(activityLabels)
-
 #combine the test file and train file into one file
 dataFile <- rbind(testFile,trainFile)
+dataFile$activity_type <- as.factor(dataFile$activity_type)
 
 rm(testFile)
 rm(trainFile)
 
-#Create a second, independent tidy data set with the average of each variable
-#for each activity and each subject.
+#label the activities
+sortDataFile <- arrange(dataFile, activity_type)
+rm(dataFile)
+
+activityLabels <- read.delim("./ucihar/UCI HAR Dataset/activity_labels.txt", header = FALSE, sep = "\t")
+levels(sortDataFile$activity_type) <- activityLabels[[1]]
+
+rm(activityLabels)
+
+#summarize data grouped by subject and activities
+outputCount <- table(sortDataFile$subject,sortDataFile$activity_type)
+outputSum <- xtabs(activity_mean ~ subject + activity_type, data = sortDataFile)
+outputTable <- outputSum / outputCount
+
+rm(sortDataFile)
+rm(outputSum)
+rm(outputCount)
+
+#save output to text file
+write.table(outputTable,"./ucihar/harSummary.txt")
+
+rm(outputTable)
