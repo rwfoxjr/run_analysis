@@ -81,6 +81,6 @@ rm(outputSum)
 rm(outputCount)
 
 #save output to text file
-write.table(outputTable,"./ucihar/harSummary.txt")
+write.table(outputTable,"./ucihar/harSummary.txt", row.names = FALSE)
 
 rm(outputTable)
