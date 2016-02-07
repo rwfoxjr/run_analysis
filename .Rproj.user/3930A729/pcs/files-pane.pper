@@ -1,0 +1,9 @@
+{
+    "path" : "~/Documents/Coursera/wk4Project/UCI HAR Dataset/data",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}

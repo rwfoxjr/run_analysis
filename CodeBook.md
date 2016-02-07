@@ -39,11 +39,166 @@ The number from 1 to 6, indicating the type of activity measured in the study:
   
   6 LAYING
 
-##activity_mean
-Measurements of the subjects activities in the study were collected in groupings of 128 measurements. The results in this file are the averages of the 128 measurement samples.
-
-##activity_standard_deviation
-These results are standard deviations calculated from the groups of 128 measurements described above
-
 ##subject
 A numerical code distinguishing the collected activity measurements by study partcipant.
+
+##activity measurements
+A subset of the measurements from the *X_test.txt* and *X_train.txt* files, that includes only the columns for means and standard deviations:
+
+* tBodyAcc-mean()-X
+
+* tBodyAcc-mean()-Y
+
+* tBodyAcc-mean()-Z
+
+* tGravityAcc-mean()-X
+
+* tGravityAcc-mean()-Y
+
+* tGravityAcc-mean()-Z
+
+* tBodyAccJerk-mean()-X
+
+* tBodyAccJerk-mean()-Y
+
+* tBodyAccJerk-mean()-Z
+
+* tBodyGyro-mean()-X
+
+* tBodyGyro-mean()-Y
+
+* tBodyGyro-mean()-Z
+
+* tBodyGyroJerk-mean()-X
+
+* tBodyGyroJerk-mean()-Y
+
+* tBodyGyroJerk-mean()-Z
+
+* tBodyAccMag-mean()
+
+* tGravityAccMag-mean()
+
+* tBodyAccJerkMag-mean()
+
+* tBodyGyroMag-mean()
+
+* tBodyGyroJerkMag-mean()
+
+* fBodyAcc-mean()-X
+
+* fBodyAcc-mean()-Y
+
+* fBodyAcc-mean()-Z
+
+* fBodyAccJerk-mean()-X
+
+* fBodyAccJerk-mean()-Y
+
+* fBodyAccJerk-mean()-Z
+
+* fBodyGyro-mean()-X
+
+* fBodyGyro-mean()-Y
+
+* fBodyGyro-mean()-Z
+
+* fBodyAccMag-mean()
+
+* fBodyBodyAccJerkMag-mean()
+
+* fBodyBodyGyroMag-mean()
+
+* fBodyBodyGyroJerkMag-mean()
+
+* fBodyAcc-meanFreq()-X
+
+* fBodyAcc-meanFreq()-Y
+
+* fBodyAcc-meanFreq()-Z
+
+* fBodyAccJerk-meanFreq()-X
+
+* fBodyAccJerk-meanFreq()-Y
+
+* fBodyAccJerk-meanFreq()-Z
+
+* fBodyGyro-meanFreq()-X
+
+* fBodyGyro-meanFreq()-Y
+
+* fBodyGyro-meanFreq()-Z
+
+* fBodyAccMag-meanFreq()
+
+* fBodyBodyAccJerkMag-meanFreq()
+
+* fBodyBodyGyroMag-meanFreq()
+
+* fBodyBodyGyroJerkMag-meanFreq()
+
+* tBodyAcc-std()-X
+
+* tBodyAcc-std()-Y
+
+* tBodyAcc-std()-Z
+
+* tGravityAcc-std()-X
+
+* tGravityAcc-std()-Y
+
+* tGravityAcc-std()-Z
+
+* tBodyAccJerk-std()-X
+
+* tBodyAccJerk-std()-Y
+
+* tBodyAccJerk-std()-Z
+
+* tBodyGyro-std()-X
+
+* tBodyGyro-std()-Y
+
+* tBodyGyro-std()-Z
+
+* tBodyGyroJerk-std()-X
+
+* tBodyGyroJerk-std()-Y
+
+* tBodyGyroJerk-std()-Z
+
+* tBodyAccMag-std()
+
+* tGravityAccMag-std()
+
+* tBodyAccJerkMag-std()
+
+* tBodyGyroMag-std()
+
+* tBodyGyroJerkMag-std()
+
+* fBodyAcc-std()-X
+
+* fBodyAcc-std()-Y
+
+* fBodyAcc-std()-Z
+
+* fBodyAccJerk-std()-X
+
+* fBodyAccJerk-std()-Y
+
+* fBodyAccJerk-std()-Z
+
+* fBodyGyro-std()-X
+
+* fBodyGyro-std()-Y
+
+* fBodyGyro-std()-Z
+
+* fBodyAccMag-std()
+
+* fBodyBodyAccJerkMag-std()
+
+* fBodyBodyGyroMag-std()
+
+* fBodyBodyGyroJerkMag-std()
