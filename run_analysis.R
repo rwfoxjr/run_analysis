@@ -1,4 +1,4 @@
-#load dplyr
+#load plyr and dplyr
 library("dplyr", lib.loc="/Library/Frameworks/R.framework/Versions/3.2/Resources/library")
 
 #download UCI HAR dataset
@@ -7,80 +7,82 @@ if(!file.exists("./ucihar")) {dir.create("./ucihar")}
 download.file(urlUcihar, destfile = "./ucihar/dataset.zip", method = "curl")
 dataZip <- "./ucihar/dataset.zip"
 unzip(dataZip,exdir = "./ucihar")
-
-rm(urlUcihar)
 rm(dataZip)
+rm(urlUcihar)
 
-#open the three files each for test and train 
-xtestFile <- read.delim("./ucihar/UCI HAR Dataset/test/X_test.txt", header = FALSE, sep = "\t", stringsAsFactors = FALSE)
-ytestFile <- read.delim("./ucihar/UCI HAR Dataset/test/y_test.txt", header = FALSE, sep = "\t")
-subjectTestFile <- read.delim("./ucihar/UCI HAR Dataset/test/subject_test.txt", header = FALSE, sep = "\t")
-xtrainFile <- read.delim("./ucihar/UCI HAR Dataset/train/X_train.txt", header = FALSE, sep = "\t", stringsAsFactors = FALSE)
-ytrainFile <- read.delim("./ucihar/UCI HAR Dataset/train/y_train.txt", header = FALSE, sep = "\t")
-subjectTrainFile <- read.delim("./ucihar/UCI HAR Dataset/train/subject_train.txt", header = FALSE, sep = "\t")
+#open the features file, and the three files each for test and train 
+featuresTable <- read.table("./ucihar/UCI HAR Dataset/features.txt", header = FALSE)
+xTestTable <- read.table("./ucihar/UCI HAR Dataset/test/X_test.txt", header = FALSE)
+yTestTable <- read.table("./ucihar/UCI HAR Dataset/test/y_test.txt", header = FALSE, col.names = "Activity Type", colClasses = "character")
+subjectTestTable <- read.table("./ucihar/UCI HAR Dataset/test/subject_test.txt", header = FALSE, col.names = "Subject")
+xTrainTable <- read.table("./ucihar/UCI HAR Dataset/train/X_train.txt", header = FALSE)
+yTrainTable <- read.table("./ucihar/UCI HAR Dataset/train/y_train.txt", header = FALSE, col.names = "Activity Type")
+subjectTrainTable <- read.table("./ucihar/UCI HAR Dataset/train/subject_train.txt", header = FALSE, col.names = "Subject")
 
-#unpack the numeric data fom lists within lists
-unpackList <- function(x) {
-  lengthTest <- length(x[[1]])
-  meanTest <- vector("numeric",lengthTest)
-  sdTest <- vector("numeric",lengthTest)
-  for (i in 1:lengthTest) {
-    lineTest <- x[[1]][[i]]
-    parseTest <- strsplit(lineTest[[1]],"\\s")
-    vectorTest <- as.vector(strsplit(parseTest[[1]],"\\s"),"numeric")
-    meanTest[i] <- mean(vectorTest,na.rm = TRUE)
-    sdTest[i] <- sd(vectorTest,na.rm = TRUE)
-  }
-  resultTest <- data.frame(meanTest,sdTest)
-  return(resultTest)
-}
+names(xTestTable) <- featuresTable[,2]
+names(xTrainTable) <- featuresTable[,2]
 
-xTestUnpack <- unpackList(xtestFile)
-xTrainUnpack <- unpackList(xtrainFile)
+rm(featuresTable)
 
-rm(xtestFile)
-rm(xtrainFile)
-rm(unpackList)
+#create one table from each set of test tables and train tables
+testTable <- data.frame(yTestTable, subjectTestTable, xTestTable)
+trainTable <- data.frame(yTrainTable, subjectTrainTable, xTrainTable)
 
-#create one file from each set of test files and train files
-testFile <- data.frame(measurements = ytestFile, activity = xTestUnpack, subject = subjectTestFile)
-trainFile <- data.frame(measurements = ytrainFile, activity = xTrainUnpack, subject = subjectTrainFile)
-names(testFile) <- c("activity_type","activity_mean","activity_standard_deviation", "subject")
-names(trainFile) <- c("activity_type","activity_mean","activity_standard_deviation", "subject")
+rm(xTestTable)
+rm(xTrainTable)
+rm(yTestTable)
+rm(yTrainTable)
+rm(subjectTestTable)
+rm(subjectTrainTable)
 
-rm(xTestUnpack)
-rm(xTrainUnpack)
-rm(ytestFile)
-rm(ytrainFile)
-rm(subjectTestFile)
-rm(subjectTrainFile)
+#combine the test table and train table into one file
+dataTable <- rbind(testTable,trainTable)
 
-#combine the test file and train file into one file
-dataFile <- rbind(testFile,trainFile)
-dataFile$activity_type <- as.factor(dataFile$activity_type)
-
-rm(testFile)
-rm(trainFile)
+#dataFile$activity_type <- as.factor(dataFile$activity_type)
+rm(testTable)
+rm(trainTable)
 
 #label the activities
-sortDataFile <- arrange(dataFile, activity_type)
-rm(dataFile)
+activityLabels <- read.table("./ucihar/UCI HAR Dataset/activity_labels.txt", header = FALSE, colClasses = c("character","character"))
 
-activityLabels <- read.delim("./ucihar/UCI HAR Dataset/activity_labels.txt", header = FALSE, sep = "\t")
-levels(sortDataFile$activity_type) <- activityLabels[[1]]
+convertActivityName <- function(x) {
+  lengthName <- length(x[[1]])
+  for (i in 1:lengthName) {
+    if(x[i,1]=="1") {
+      x[i,1] <- activityLabels[1,2]   
+    }else{
+      if(x[i,1]=="2") {
+       x[i,1] <- activityLabels[2,2] 
+      }else{
+        if(x[i,1]=="3") {
+          x[i,1] <- activityLabels[3,2]
+        }else{
+          if(x[i,1]=="4") {
+            x[i,1] <- activityLabels[4,2]
+          }else{
+            if(x[i,1]=="5") {
+              x[i,1] <- activityLabels[5,2]
+            }else{
+              x[i,1] <- activityLabels[6,2]
+            }
+          }
+        }
+      }
+    }
+  }
+  return(x)
+}
 
+dataTable <- convertActivityName(dataTable)
 rm(activityLabels)
+rm(convertActivityName)
 
-#summarize data grouped by subject and activities
-outputCount <- table(sortDataFile$subject,sortDataFile$activity_type)
-outputSum <- xtabs(activity_mean ~ subject + activity_type, data = sortDataFile)
-outputTable <- outputSum / outputCount
+#Step 5 - group and subset table and save to file
+dataTable <- group_by(dataTable,Activity.Type,Subject)
+outputTable <- dataTable[c(1,2,grep("mean()|std",names(dataTable)))]
+summaryTable <- summarize_each(outputTable,funs(mean))
+write.table(outputTable,"./ucihar/harSummary.txt")
 
-rm(sortDataFile)
-rm(outputSum)
-rm(outputCount)
-
-#save output to text file
-write.table(outputTable,"./ucihar/harSummary.txt", row.names = FALSE)
-
+rm(dataTable)
 rm(outputTable)
+rm(summaryTable)
